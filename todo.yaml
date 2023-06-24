@@ -1,0 +1,188 @@
+openapi: 3.1.0
+info:
+  title: ToDo List App
+  description: This is a server app to manage ToDo-lists
+  contact:
+    name: Moritz Hoefelmeyer
+    email: moritz@hoefelmeyer.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: '0.1'
+servers:
+  - url: http://127.0.0.1:5000
+paths:
+  /todo-list/{list_id}:
+    get:
+      summary: GET single ToDo-list by UUID
+      description: This gets all list entries from a single list by UUID
+      operationId: getList
+      parameters:
+        - in: query
+          name: list_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: fetching successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoList'
+        '404':
+          description: incorrect Id
+    delete:
+      summary: DELETE single ToDo-list by UUID
+      description: This deletes a single list and all its entries by UUID
+      operationId: deleteList
+      parameters:
+        - in: query
+          name: list_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: deletion successful
+          content:
+            text:
+              schema:
+                type: string
+                enum:
+                  - deletion successful
+        '404':
+          description: incorrect Id          
+  /todo-list:
+    post:
+      summary: POST single ToDo-List
+      description: Adds a new ToDo-List.
+      operationId: postList
+      requestBody:
+        description: data as json file
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postrequest'
+        required: true
+      responses:
+        '200':
+          description: list was successfully added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoList'
+  /todo-list/{list_id}/entry:
+    post:
+      summary: POST a single entry onto ToDo-List
+      description: Adds a single entry onto an existing Todo-Liste.
+      parameters:
+        - in: query
+          name: list_id
+          description: UUID of ToDo-List
+          schema:
+            type: string
+      requestBody:
+        description: data as json file
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/todoList'
+        required: true
+      responses:
+        '200':
+          description: successful request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoList'
+        '404':
+          description: incorrect Id
+        default:
+        '400':
+          description: incorrect data
+  /todo-list/{list_id}/entry/{entry_id}:
+    put:
+      summary: UPDATES list entry
+      description: Updates an entry in a list by Id.
+      parameters:
+        - name: list_id
+          in: query
+          description: UUID of todo-list
+          schema:
+            type: string
+            format: uuid
+        - name: entry_id
+          in: query
+          description: entry Id
+          schema:
+            type: string
+      requestBody:
+        description: data as json file
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/todoList'
+        required: true
+      responses:
+        '200':
+          description: successful request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/todoList'
+        '404':
+          description: incorrect Id
+        default:
+        '400':
+          description: incorrect data
+  /todo-list/{list_id}/{entry_id}/delete:
+    delete:
+      summary: DELETE single entry
+      description: Deletes a single entry from a ToDo-List.
+      parameters:
+        - name: list_id
+          in: query
+          description: UUID of the ToDo-List
+          schema:
+            type: string
+        - name: entry_id
+          in: query
+          description: entry Id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: deletion successful
+          content:
+            text:
+              schema:
+                type: string
+                enum:
+                  - deletion successful
+        default:
+        '404':
+          description: incorrect Id
+components:
+  schemas:
+    todoList:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '95e707d3-fa0b-4128-973c-b87d5c3e6811'
+        name:
+          type: string
+          example: 'New List'
+        beschreibung:
+          type: string
+          example: 'Magic Matchups'
+    postrequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'New List'
+        beschreibung:
+          type: string
+          example: 'Shopping'
